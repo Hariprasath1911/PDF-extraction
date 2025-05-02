@@ -4,19 +4,19 @@ import re
 import json
 import spacy
 import subprocess
-import importlib.util
+import sys
+import spacy.util
 
-# Automatically download the spaCy model if not present
+# Function to safely load spaCy model
+def load_spacy_model(model_name):
+    if not spacy.util.is_package(model_name):
+        st.warning(f"Downloading spaCy model: {model_name}")
+        subprocess.run([sys.executable, "-m", "spacy", "download", model_name], check=True)
+    return spacy.load(model_name)
+
+# Load model safely
 model_name = "en_core_web_sm"
-
-def is_model_installed(model_name):
-    return importlib.util.find_spec(model_name) is not None
-
-if not is_model_installed(model_name):
-    st.warning("Downloading spaCy model...")
-    subprocess.run(["python", "-m", "spacy", "download", model_name])
-
-nlp = spacy.load(model_name)
+nlp = load_spacy_model(model_name)
 
 # Predefined skills list
 SKILLS_DB = [
